@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@clerk/nuxt": "^1.13.8",
     "@nuxt/content": "^3.9.0",
     "@nuxt/eslint": "^1.12.1",
     "@nuxt/image": "^2.0.0",
@@ -17,6 +18,7 @@
     "better-sqlite3": "^12.5.0",
     "eslint": "^9.39.2",
     "nuxt": "^4.2.2",
+    "prettier": "^3.7.4",
     "primevue": "^4.5.3",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-primeui": "^0.6.1",

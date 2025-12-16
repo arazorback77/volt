@@ -1,15 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  srcDir: 'app/',
-  css: ['~/assets/css/main.css'],
+  srcDir: "app/",
+  css: ["~/assets/css/main.css"],
   modules: [
-    '@nuxt/content',
-    '@nuxt/eslint',
-    '@nuxt/image',
-    '@nuxt/ui'
+    "@nuxt/content",
+    "@nuxt/eslint",
+    "@nuxt/image",
+    "@clerk/nuxt",
+    "@nuxt/ui",
   ],
   vite: {
     // plugins: [tailwindcss()],
@@ -45,7 +46,7 @@ export default defineNuxtConfig({
           // Add remark-oembed
           // 'remark-oembed': {
           // Options
-        }
+        },
       },
       // rehypePlugins: {
       // 'rehype-figure': {
@@ -79,5 +80,4 @@ export default defineNuxtConfig({
   // ],
   // }
   // }
-
-})
+});

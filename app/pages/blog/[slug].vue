@@ -1,4 +1,9 @@
 <script setup>
+
+definePageMeta({
+  layout: 'gof',
+})
+
 const slug = useRoute().params.slug
 console.log(slug)
 

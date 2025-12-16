@@ -10,8 +10,8 @@
   <UApp>
     <NuxtLoadingIndicator />
 
-    <!-- <NuxtLayout >  -->
-    <NuxtLayout name="gof"> 
+    <NuxtLayout > 
+    <!-- <NuxtLayout :name="gof"> -->
       <NuxtPage />
     </NuxtLayout>
   </UApp>
@@ -23,5 +23,6 @@
 import Button from '@/components/volt/SecondaryButton.vue';
 import Avatar from '@/components/volt/Avatar.vue';
 // import AvatarGroup from '@/volt/AvatarGroup.vue';
+const gof = 'gof'
 
 </script>
