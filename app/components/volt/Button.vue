@@ -1,5 +1,5 @@
 <template>
-    <Button
+    <VoltButton
         unstyled
         :pt="theme"
         :ptOptions="{
@@ -9,11 +9,11 @@
         <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">
             <slot :name="slotName" v-bind="slotProps ?? {}" />
         </template>
-    </Button>
+    </VoltButton>
 </template>
 
 <script setup lang="ts">
-import Button, { type ButtonPassThroughOptions, type ButtonProps } from 'primevue/button';
+import VoltButton, { type ButtonPassThroughOptions, type ButtonProps } from 'primevue/button';
 import { ref } from 'vue';
 import { ptViewMerge } from './utils';
 
