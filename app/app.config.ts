@@ -2,10 +2,15 @@ export default defineAppConfig({
   ui: {
     colors: {
       primary: "emerald",
+      secondary: "slate",
+      info: "blue",
+      success: "green",
+      warning: "yellow",
+      error: "red",
       neutral: "zinc",
-      gof: "bluegrey",
-      gofinv: "bluegrey",
-      gofhead: "bluegrey",
+      gofbrand: "lime",
+      gofinvbrand: "indigo",
+      gofhead: "rose",
     },
     button: {
       slots: {
@@ -26,62 +31,7 @@ export default defineAppConfig({
       },
     },
     navigationMenu: {
-      slots: {
-        // root: 'relative flex gap-1.5 [&>div]:min-w-0',
-        // list: 'isolate min-w-0',
-        label: "text-(--gofhead-inv)",
-        // label: 'w-full flex items-center gap-1.5 font-semibold text-xs/5 text-(--ui-text-highlighted) px-2.5 py-1.5',
-        // item: "min-w-0",
-        // link: "group relative w-full flex items-center gap-1.5 font-medium text-sm before:absolute before:z-[-1] before:rounded-[calc(var(--ui-radius)*1.5)] focus:outline-none focus-visible:outline-none dark:focus-visible:outline-none focus-visible:before:ring-inset focus-visible:before:ring-2",
-        // linkLeadingIcon: "shrink-0 size-5",
-        // linkLeadingAvatar: "shrink-0",
-        // linkLeadingAvatarSize: "2xs",
-        // linkTrailing: "ms-auto inline-flex gap-1.5 items-center",
-        // linkTrailingBadge: "shrink-0",
-        // linkTrailingBadgeSize: "sm",
-        // linkTrailingIcon:
-        //   "size-5 transform shrink-0 group-data-[state=open]:rotate-180 transition-transform duration-200",
-        // linkLabel: "truncate",
-        linkLabelExternalIcon: "text-(--gofhead-inv)",
-        // linkLabelExternalIcon: 'inline-block size-3 align-top text-(--ui-text-dimmed)',
-        // childList: "",
-        // childItem: "",
-        // childLink:
-        //   "group size-full px-3 py-2 rounded-[calc(var(--ui-radius)*1.5)] flex items-start gap-2 text-start",
-        // childLinkWrapper: "flex flex-col items-start",
-        // childLinkIcon: "size-5 shrink-0",
-        // childLinkLabel: "font-semibold text-sm relative inline-flex",
-        // childLinkLabelExternalIcon: 'inline-block size-3 align-top text-(--ui-text-dimmed)',
-        childLinkLabelExternalIcon: "text-(--gofhead-inv)",
-        // childLinkDescription: 'text-sm text-(--ui-text-muted)',
-        childLinkDescription: "text-(--gofhead-inv)",
-        // separator: 'px-2 h-px bg-(--ui-border)',
-        separator: "bg-(--gofhead-accent)",
-        // viewportWrapper: "absolute top-full left-0 flex w-full",
-        viewport: "bg-gray-900 ring-(--gofhead) z-100",
-        // viewport: 'relative overflow-hidden bg-(--ui-bg) shadow-lg rounded-[calc(var(--ui-radius)*1.5)] ring ring-(--ui-border) h-(--reka-navigation-menu-viewport-height) w-full transition-[width,height,left] duration-200 origin-[top_center] data-[state=open]:animate-[scale-in_100ms_ease-out] data-[state=closed]:animate-[scale-out_100ms_ease-in]',
-        // content: "absolute top-0 left-0 w-full",
-        // indicator:
-        // "absolute data-[state=visible]:animate-[fade-in_100ms_ease-out] data-[state=hidden]:animate-[fade-out_100ms_ease-in] data-[state=hidden]:opacity-0 bottom-0 z-[1] w-(--reka-navigation-menu-indicator-size) translate-x-(--reka-navigation-menu-indicator-position) flex h-2.5 items-end justify-center overflow-hidden transition-[translate,width] duration-200",
-        // arrow: 'relative top-[50%] size-2.5 rotate-45 border border-(--ui-border) bg-(--ui-bg) z-[1] rounded-[calc(var(--ui-radius)/2)]'
-        arrow: "border-(--gofhead-accent) bg-(--ui-gof)",
-      },
-      variants: {
-        active: {
-          true: {
-            childLink: "bg-(--gofhead-accent) text-(--gofhead-inv)",
-            childLinkIcon: "text-(--gofhead-inv)",
-          },
-          false: {
-            link: "text-(--gofhead-inv)",
-            linkLeadingIcon: "text-(--gofhead-inv)",
-            childLink:
-              "hover:bg-(--gofhead-accent)/50 text-(--gofhead-inv) hover:text-(--gofhead-inv)",
-            childLinkIcon:
-              "text-(--gofhead-inv) group-hover:text-(--gofhead-inv)",
-          },
-        },
-      },
+      slots: {},
     },
     modal: {
       slots: {

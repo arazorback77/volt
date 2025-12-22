@@ -1,13 +1,3 @@
-<script setup lang="ts">
-import SplitterPanel from "primevue/splitterpanel";
-
-definePageMeta({});
-
-const collapsed = ref(false);
-
-const { isNotificationsSlideoverOpen } = useDashboard();
-</script>
-
 <template>
   <UDashboardGroup unit="rem" class="fixed top-0 flex flex-col overflow-hidden">
     <UDashboardNavbar
@@ -131,3 +121,13 @@ const { isNotificationsSlideoverOpen } = useDashboard();
     </div>
   </UDashboardGroup>
 </template>
+
+<script setup lang="ts">
+import SplitterPanel from "primevue/splitterpanel";
+
+definePageMeta({});
+
+const collapsed = ref(false);
+
+const { isNotificationsSlideoverOpen } = useDashboard();
+</script>
