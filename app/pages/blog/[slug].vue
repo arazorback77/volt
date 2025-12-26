@@ -6,7 +6,7 @@ definePageMeta({
 const slug = useRoute().params.slug;
 console.log(slug);
 
-const { data } = await useAsyncData("navigation", () => {
+const { data: navigation } = await useAsyncData("navigation", () => {
   return queryCollectionNavigation("blog");
 });
 
@@ -20,25 +20,24 @@ const { data: surround } = await useAsyncData(`blog-${slug}-surround`, () => {
 </script>
 
 <template>
-  <NuxtLayout name="gof">
+  <TemplateGof>
     <template #left>
-      <div
-        class="lg:block lg:max-h-[calc(100vh-60px)] lg:sticky lg:top-60 py-8 lg:ps-4 lg:-ms-4 lg:pe-6.5 lg:col-span-2"
-      >
-        <div class="relative">
-          <!-- <UContentSearchButton :collapsed="false" class="sticky top-60" /> -->
-          <UContentNavigation
-            :navigation="data"
-            highlight
-            color="primary"
-            variant="pill"
-            highlight-color="error"
-            :ui="{
-              root: 'overflow-y-auto ',
-            }"
-          />
-        </div>
-
+      <div class="ps-4">
+        <UContentNavigation
+          :navigation="navigation"
+          highlight
+          color="primary"
+          variant="pill"
+          highlight-color="error"
+          :ui="{
+            root: 'ms-0',
+            list: 'mx-0 mt-0',
+            item: 'ps-0 ms-0',
+            link: 'px-0',
+            itemWithChildren: 'ps-0  ms-0',
+            listWithChildren: 'ms-4',
+          }"
+        />
         <ClientOnly>
           <LazyUContentSearch
             v-model:search-term="searchTerm"
@@ -53,21 +52,37 @@ const { data: surround } = await useAsyncData(`blog-${slug}-surround`, () => {
     </template>
 
     <template #main>
-      <UPage class="w-full">
-        <UPageHeader :title="post.title" :description="post.description" />
-
-        <UPageBody>
+      <div class="w-full flex flex-col px-8 gap-4">
+        <div class="w-full h-10 bg-accent flex items-center flex-none px-0">
+          <!-- <UBreadcrumb :items="items" /> -->
+          <p>header for breadbrum</p>
+        </div>
+        <div
+          class="w-full h-70 lg:min-h-[calc(100vh-var(--g-totalsum-height)-72px)] min-h-[calc(100vh-var(--g-innersum-height)-72px)] overflow-y-auto pb-16"
+        >
           <ContentRenderer :value="post" />
-
-          <USeparator />
-
-          <UContentSurround :surround="surround" />
-        </UPageBody>
-      </UPage>
+        </div>
+        <div
+          class="w-full h-(--g-inner-height) flex-none justify-center items-center"
+        >
+          <UContentSurround
+            :surround="surround"
+            :ui="{
+              root: '',
+              link: 'flex gap-4 py-2 px-2 items-center last:flex-row-reverse',
+              linkLeading: 'mb-0',
+              linkLeadingIcon: 'size-4',
+              linkTitle: 'text-md',
+            }"
+          />
+        </div>
+      </div>
     </template>
 
     <template #right>
-      <UContentToc :links="post?.body?.toc?.links" />
+      <div class="flex flex-col py-10">
+        <UContentToc :links="post?.body?.toc?.links" />
+      </div>
     </template>
-  </NuxtLayout>
+  </TemplateGof>
 </template>

@@ -1,15 +1,10 @@
 <template>
   <UApp class="overflow-auto">
     <NuxtLoadingIndicator />
-
-    <!-- <NuxtLayout :name="gof">
+    <NuxtLayout>
       <NuxtPage />
-    </NuxtLayout> -->
-
-    <NuxtPage />
+    </NuxtLayout>
   </UApp>
 </template>
 
-<script setup lang="ts">
-const gof = "gof";
-</script>
+<script setup lang="ts"></script>

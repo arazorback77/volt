@@ -20,6 +20,7 @@
     "nuxt": "^4.2.2",
     "prettier": "^3.7.4",
     "primevue": "^4.5.3",
+    "reka-ui": "^2.7.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-primeui": "^0.6.1",
     "typescript": "^5.9.3",

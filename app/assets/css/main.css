@@ -68,6 +68,13 @@
   --p-content-border-radius: 6px;
 
   --ui-header-height: 60px;
+  --g-foot-height: 40px;
+  --g-inner-height: 60px;
+  --g-innersum-height: calc(var(--ui-header-height) + var(--g-inner-height));
+  --g-sum-height: calc(var(--ui-header-height) + var(--g-foot-height));
+  --g-totalsum-height: calc(
+    var(--ui-header-height) + var(--g-foot-height) + var(--g-inner-height)
+  );
 
   --ui-gof: var(--color-bluegrey-900);
   --ui-gofinv: var(--color-bluegrey-400);

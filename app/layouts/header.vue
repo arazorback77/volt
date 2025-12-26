@@ -12,6 +12,7 @@ const collapsed = ref(false);
         class: 'rounded-full',
       }"
       toggle-side="left"
+      class="mx-10"
       :ui="{
         root: 'bg-(--g-head-bg) sm:pl-4 sm:pr-4',
         left: 'gap-1.5',

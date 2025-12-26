@@ -4,7 +4,7 @@ definePageMeta({
 });
 
 const { data } = await useAsyncData("navigation", () => {
-  return queryCollectionNavigation("blog").order("path", "ASC");
+  return queryCollectionNavigation("blog").order("title", "DESC");
 });
 
 const { data: files } = useLazyAsyncData(
@@ -35,12 +35,11 @@ const searchTerm = ref("");
 </script>
 
 <template>
-    <LayoutGof>
+  <div>
+    <NuxtLayout name="custom">
       <template #left>
-        <div class="lg:block lg:max-h-[calc(100vh-60px)] overflow-y-auto">
-          <!-- <div class="sticky top-0 bg-amber-700 h-60"> -->
-          <!-- <UContentSearchButton :collapsed="false" /> -->
-          <!-- </div> -->
+        <div class="flex flex-col gap-4 flex-1 overflow-y-auto px-4 py-2">
+          <UContentSearchButton :collapsed="false" />
           <UContentNavigation
             :navigation="data"
             highlight
@@ -61,19 +60,9 @@ const searchTerm = ref("");
           </ClientOnly>
         </div>
       </template>
-      <template #main>
-        <div class="min-h-[calc(100vh-var(--ui-header-height))] overflow-auto">
-          main
-        </div>
-      </template>
+      <template #main> main </template>
 
-      <template #right>
-        right
-        <NuxtLink to="/blog/boo">Boo</NuxtLink>
-        <NuxtLink to="/blog/foo">Foo</NuxtLink>
-        <NuxtLink to="/lay">Layout</NuxtLink>
-        <NuxtLink to="/lay2">Layout2</NuxtLink>
-      </template>
-    </LayoutGoF>
-
+      <template #right> right </template>
+    </NuxtLayout>
+  </div>
 </template>

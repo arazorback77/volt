@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: "default",
+  // layout: false,
 });
 const slug = useRoute().params.slug;
 console.log(slug);
@@ -47,9 +47,5 @@ const searchTerm = ref("");
 </script>
 
 <template>
-  <div>
-    <div>aaaaa</div>
-    <NuxtLink to="/two">Two</NuxtLink>
-    <NuxtLink to="/zzz">zzz</NuxtLink>
-  </div>
+  <div></div>
 </template>

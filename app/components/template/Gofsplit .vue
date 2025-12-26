@@ -117,7 +117,7 @@
 
       <div class="w-full flex flex-col overflow-hidden">
         <VoltSplitter
-          pt:root:class="dark:bg-elevated/50 overflow-hidden mb-0 lg:min-h-[calc(100vh-var(--g-sum-height))]"
+          pt:root:class="dark:bg-elevated/50 overflow-hidden mb-0 lg:min-h-[calc(100vh-var(--g-totalsum-height))] min-h-[calc(100vh-var(--g-innersum-height))"
         >
           <SplitterPanel :size="75" class="overflow-hidden">
             <slot name="main" />
@@ -128,7 +128,7 @@
         </VoltSplitter>
       </div>
     </div>
-    <div class="h-(--g-foot-height)">Footer</div>
+    <div class="h-(--g-foot-height) hidden lg:block">Footer</div>
   </UDashboardGroup>
 </template>
 
