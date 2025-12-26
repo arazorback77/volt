@@ -1,12 +1,14 @@
 <template>
   <div class="w-full flex flex-row overflow-hidden">
     <SplitterGroup
+      id="lmr-group"
       auto-save-id="gof-splitter2"
       direction="horizontal"
-      class="h-full min-h-[calc(200vh-100px)] !overflow-visible"
+      class="h-full min-h-[calc(100vh-100px)]"
     >
       <template v-if="$slots.left">
         <SplitterPanel
+          id="lmr-group-left"
           ref="leftPanelRef"
           collapsible
           :default-size="leftSize"
@@ -18,7 +20,7 @@
         </SplitterPanel>
         <SplitterResizeHandle class="w-0.5 bg-elevated hover:w-2" />
       </template>
-      <SplitterPanel :default-size="mainSize" class="px-20">
+      <SplitterPanel id="lmr-group-main" :default-size="mainSize" class="px-20">
         <UButton
           v-if="leftPanelRef?.isCollapsed"
           icon="i-lucide-chevron-right"
@@ -43,7 +45,7 @@
           <UButton icon="i-lucide-plus" size="md" class="rounded-full" />
 
           <template #content>
-            <LayoutHeaderCenter orientaion="vertical" />
+            <FragmentHeaderCenter orientaion="vertical" />
           </template>
         </UPopover>
 
@@ -72,6 +74,7 @@
         <SplitterResizeHandle class="w-0.5 bg-elevated hover:w-2" />
 
         <SplitterPanel
+          id="lmr-group-right"
           ref="rightPanelRef"
           collapsible
           :collapsed-size="0"
@@ -90,22 +93,36 @@
 import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from "reka-ui";
 
 definePageMeta({});
-const props = defineProps<{
+const { leftSize = 25, rightSize = 15 } = defineProps<{
   leftSize?: number;
   rightSize?: number;
 }>();
 
-const slots = useSlots();
+// const mainSize = ref(60);
+
+// const mainSize = computed(() => {
+//   if (slots.left) {
+//     return 100 - (props.rightSize || 0);
+//   } else if (slots.right) {
+//     return 100 - (props.leftSize || 0);
+//   } else {
+//     return 100 - (props.leftSize || 0) - (props.rightSize || 0);
+//   }
+// });
 
 const mainSize = computed(() => {
-  if (slots.left) {
-    return 100 - (props.rightSize || 0);
-  } else if (slots.right) {
-    return 100 - (props.leftSize || 0);
-  } else {
-    return 100 - (props.leftSize || 0) - (props.rightSize || 0);
-  }
+  return 100 - leftSize - rightSize;
 });
+
+// const mainSize = computed(() => {
+//   if (!slots.left && slots.right) {
+//     return 100;
+//   } else if (!slots.right) {
+//     return 100 - (props.leftSize || 0);
+//   } else {
+//     return 100 - (props.leftSize || 0) - (props.rightSize || 0);
+//   }
+// });
 
 // const leftPanelRef = ref<InstanceType<typeof SplitterPanel>>("l");
 // const panelRefRight = useTemplateRef<InstanceType<typeof SplitterPanel>>();

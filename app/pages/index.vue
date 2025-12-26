@@ -51,5 +51,6 @@ const searchTerm = ref("");
     <div>aaaaa</div>
     <NuxtLink to="/two">Two</NuxtLink>
     <NuxtLink to="/zzz">zzz</NuxtLink>
+    <NuxtLink to="/qqq">qqq</NuxtLink>
   </div>
 </template>

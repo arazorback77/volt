@@ -1,21 +1,21 @@
 <template>
-  <UHeader
+  <UDashboardNavbar
     :toggle="{
       color: 'primary',
       variant: 'subtle',
       class: 'rounded-full',
     }"
     toggle-side="left"
-    mode="modal"
+    class="mx-0"
     :ui="{
-      root: 'relative z-20',
-      title: 'lg:ps-4 gap-10',
-      container: 'max-w-full px-4',
-      right: 'px-4 ',
+      root: 'bg-(--g-head-bg) sm:pl-4 sm:pr-4 lg:mx-10',
+      left: 'gap-1.5',
+      right: 'gap-1.5 lg:gap-3',
     }"
   >
-    <template #title>
+    <template #leading>
       <FragmentHeaderLogo />
+
       <slot name="toggleButton" />
     </template>
     <template #default>
@@ -54,8 +54,6 @@
         <UserButton />
       </SignedIn>
     </template>
-  </UHeader>
+  </UDashboardNavbar>
 </template>
-
-<!-- Header for Template -->
 <script setup lang="ts"></script>

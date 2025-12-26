@@ -5,12 +5,14 @@ definePageMeta({
 </script>
 
 <template>
-  <NuxtLayout name="base-left-main-right-scratch">
+  <NuxtLayout name="base-left-main-right">
     <template #left>
       <div>
         <div>ZZZZ Page</div>
         <ULink to="/">Home</ULink>
         <ULink to="/two">Two</ULink>
+        <ULink to="/qqq">Qqq</ULink>
+        <ULink to="/www">WWW</ULink>
       </div>
     </template>
     <template #main> main </template>
