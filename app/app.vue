@@ -1,6 +1,6 @@
 <template>
-  <UApp class="overflow-auto">
-    <NuxtLoadingIndicator />
+  <UApp>
+    <!-- <NuxtLoadingIndicator /> -->
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

@@ -12,9 +12,21 @@ export default defineNuxtConfig({
     "@clerk/nuxt",
     "@nuxt/ui",
   ],
+  runtimeConfig: {
+    apiSecret: "", // can be overridden by NUXT_API_SECRET environment variable
+    motherduckToken: "", // can be overridden by NUXT_MOTHERDUCK_TOKEN environment variable
+    oracleUrl: "", // can be overridden by NUXT_ORACLE_URL environment variable
+    public: {
+      apiBase: "", // can be overridden by NUXT_PUBLIC_API_BASE environment variable
+    },
+  },
+
   vite: {
     // plugins: [tailwindcss()],
   },
+  // nitro: {
+  //   plugins: ["plugins/duckdb.ts"],
+  // },
   ui: {
     theme: {
       colors: [

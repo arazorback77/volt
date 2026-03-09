@@ -7,7 +7,9 @@ definePageMeta({
 <template>
   <div>
     <div>aaaaa</div>
-    <NuxtLink to="/">Home</NuxtLink>
-    <NuxtLink to="/zzz">zzz</NuxtLink>
+    <ULink to="/">Home</ULink>
+    <ULink to="/zzz">zzz</ULink>
+    <ULink to="/qqq">qqq</ULink>
+    <ULink to="/www">www</ULink>
   </div>
 </template>

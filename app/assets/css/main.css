@@ -3,6 +3,15 @@
 @import "tailwindcss-primeui";
 /* @custom-variant dark (&:where(.p-dark, .p-dark *, .dark, .dark *)); */
 
+@layer utilities {
+  .scrollbar-hide {
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+  }
+}
+
 @theme static {
   --color-bluegrey-50: #eceff1;
   --color-bluegrey-100: #cfd8dc;
@@ -90,9 +99,17 @@
   --gofhead-accent: var(--color-bluegrey-400);
 }
 .dark {
-  --g-logo: var(--color-bluegrey-800);
-  --g-logo-line: var(--color-red-800);
+  /* --g-logo: var(--color-bluegrey-800); */
+  /* --g-logo-line: var(--color-red-800); */
+  /* --g-logo-line: var(--bg-default) / 75; */
+  --g-logo: var(--color-slate-700);
+  --g-logo-line: var(--color-white);
   --g-logo-bg: var(--color-white);
+  /* --g-logo: var(--color-bluegrey-100); */
+  /* --g-logo: var(--ui-color-primary-600); */
+  /* --g-logo: var(--ui-primary); */
+  /* --g-logo-line: var(--bg-slate-900); */
+  /* --g-logo-bg: var(--color-slate-900); */
   --g-logo-font: var(--color-white);
   --g-logo-font-accent: var(--color-white);
 
@@ -106,6 +123,7 @@
   --ui-bg-elevated: var(--color-slate-800);
   --ui-bg-accented: var(--color-slate-700);
   --ui-bg-inverted: white;
+  --ui-bg-gof: var(--color-bluegrey-200);
 
   /* --ui-bg-elevated: var(--color-red-400); */
   /* --ui-text: var(--ui-color-neutral-200); */
@@ -113,6 +131,11 @@
   --ui-bg-invert: var(--ui-color-neutral-100);
   --ui-fg: var(--color-bluegrey-200);
   --ui-fg-invert: var(--color-bluegrey-900);
+
+  --ui-border: var(--ui-color-neutral-800);
+  --ui-border-muted: var(--ui-color-neutral-700);
+  --ui-border-accented: var(--ui-color-neutral-700);
+  --ui-border-inverted: white;
 
   --p-primary-color: var(--ui-color-primary-400);
   --p-primary-contrast-color: var(--p-surface-900);

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col">
     <FragmentHeader>
-      <template #toggleButton>
+      <template v-if="$slots.left" #toggleButton>
         <div class="hidden lg:flex lg:h-12 lg:justify-center lg:items-center">
           <UButton
             v-if="splitterRef?.leftPanelRef?.isCollapsed"
@@ -28,13 +28,13 @@
 
     <div class="w-full overflow-hidden">
       <FragmentSplitterGFlat ref="splitterRef" :left-size="25" :right-size="15">
-        <template #left>
+        <template v-if="$slots.left" #left>
           <slot name="left" />
         </template>
         <template #main>
           <slot name="main" />
         </template>
-        <template #right>
+        <template v-if="$slots.right" #right>
           <slot name="right" />
         </template>
       </FragmentSplitterGFlat>

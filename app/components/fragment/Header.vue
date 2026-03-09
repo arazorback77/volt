@@ -8,14 +8,17 @@
     toggle-side="left"
     mode="modal"
     :ui="{
-      root: 'relative z-20',
+      root: 'bg-default',
+      container: 'max-w-full justify-between',
+      left: 'flex-1 justify-start ',
+      right: 'flex-1',
       title: 'lg:ps-4 gap-10',
-      container: 'max-w-full px-4',
-      right: 'px-4 ',
+      // toggle: 'lg:hidden',
     }"
   >
     <template #title>
       <FragmentHeaderLogo />
+
       <slot name="toggleButton" />
     </template>
     <template #default>

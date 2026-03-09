@@ -19,7 +19,7 @@
       </SplitterPanel>
       <SplitterResizeHandle
         id="lmbr-group-lefthandle"
-        class="w-0.5 hover:bg-secondary hover:w-2"
+        class="w-0.5 bg-accented hover:bg-secondary hover:w-2"
       />
     </template>
     <SplitterPanel id="lmbr-group-main" :default-size="mainSize">
@@ -48,7 +48,7 @@
             <template v-if="$slots.right">
               <SplitterResizeHandle
                 id="lmbr-sub-subgroup-handle"
-                class="w-0.5 hover:bg-secondary hover:w-2"
+                class="w-0.5 bg-accented hover:bg-secondary hover:w-2"
               />
               <SplitterPanel
                 id="lmbr-sub-subgroup-right"
@@ -66,7 +66,7 @@
         <template v-if="$slots.bottom">
           <SplitterResizeHandle
             id="lmbr-subgroup-handle"
-            class="h-0.5 hover:bg-secondary hover:h-2"
+            class="h-0.5 bg-accented hover:bg-secondary hover:h-2"
           />
           <SplitterPanel
             id="lmbr-sub-subgroup-bottom"

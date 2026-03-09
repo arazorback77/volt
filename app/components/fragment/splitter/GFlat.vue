@@ -17,7 +17,9 @@
       >
         <slot name="left" />
       </SplitterPanel>
-      <SplitterResizeHandle class="w-0.5 hover:bg-secondary hover:w-2" />
+      <SplitterResizeHandle
+        class="w-0.5 bg-accented hover:bg-secondary hover:w-2"
+      />
     </template>
     <SplitterPanel
       id="lmr-group-main"
@@ -30,7 +32,7 @@
 
     <SplitterResizeHandle
       id="lmr-group-right"
-      class="w-0.5 hover:bg-secondary hover:w-2"
+      class="w-0.5 bg-accented hover:bg-secondary hover:w-2"
     />
 
     <template v-if="$slots.right">
@@ -58,19 +60,22 @@ const { leftSize = 25, rightSize = 15 } = defineProps<{
   rightSize?: number;
 }>();
 
-const mainSize = computed(() => {
-  return 100 - leftSize - rightSize;
-});
-
 // const mainSize = computed(() => {
-//   if (!slots.left && slots.right) {
-//     return 100;
-//   } else if (!slots.right) {
-//     return 100 - (props.leftSize || 0);
-//   } else {
-//     return 100 - (props.leftSize || 0) - (props.rightSize || 0);
-//   }
+//   return 100 - leftSize - rightSize;
 // });
+
+const slots = useSlots();
+const mainSize = computed(() => {
+  if (!slots.left && !slots.right) {
+    return 100;
+  } else if (!slots.left && slots.right) {
+    return 100 - rightSize;
+  } else if (slots.left && !slots.right) {
+    return 100 - leftSize;
+  } else {
+    return 100 - leftSize - rightSize;
+  }
+});
 
 // const leftPanelRef = ref<InstanceType<typeof SplitterPanel>>("l");
 // const panelRefRight = useTemplateRef<InstanceType<typeof SplitterPanel>>();

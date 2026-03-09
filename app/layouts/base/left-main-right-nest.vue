@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col">
-    <FragmentHeader>
+    <FragmentHeaderUga>
       <template #toggleButton>
         <div class="hidden lg:flex lg:h-12 lg:justify-center lg:items-center">
           <UButton
@@ -24,7 +24,7 @@
           />
         </div>
       </template>
-    </FragmentHeader>
+    </FragmentHeaderUga>
 
     <div class="w-full overflow-hidden">
       <FragmentSplitterGNested
