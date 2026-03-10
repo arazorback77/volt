@@ -16,6 +16,36 @@ export default defineNitroPlugin(async (nitroApp) => {
   //     INSERT INTO members VALUES (1, 'Alice', 30), (2, 'Bob', 25);
   //   `);
 
+  await connection.run(`
+    CREATE TABLE IF NOT EXISTS doc_comments (
+      id              VARCHAR PRIMARY KEY,
+      doc_path        VARCHAR NOT NULL,
+      selected_text   VARCHAR NOT NULL,
+      anchor_context  VARCHAR,
+      body            VARCHAR NOT NULL,
+      author_id       VARCHAR NOT NULL DEFAULT 'anonymous',
+      status          VARCHAR NOT NULL DEFAULT 'draft',
+      highlight_color VARCHAR NOT NULL DEFAULT 'yellow',
+      created_at      TIMESTAMP DEFAULT now(),
+      updated_at      TIMESTAMP DEFAULT now(),
+      approved_by     VARCHAR,
+      approved_at     TIMESTAMP
+    );
+  `);
+  // migration: 기존 테이블에 highlight_color 컬럼이 없으면 추가
+  // DuckDB는 ADD COLUMN에서 NOT NULL 제약을 지원하지 않으므로 DEFAULT만 사용
+  await connection.run(
+    `ALTER TABLE doc_comments ADD COLUMN IF NOT EXISTS highlight_color VARCHAR DEFAULT 'yellow';`
+  );
+  // migration: anchor_offset — 컨테이너 내 선택 시작 문자 오프셋 (중복 텍스트 정밀 위치용)
+  await connection.run(
+    `ALTER TABLE doc_comments ADD COLUMN IF NOT EXISTS anchor_offset INTEGER DEFAULT 0;`
+  );
+  // migration: type — 'comment' | 'highlight' (하이라이트 전용 구분)
+  await connection.run(
+    `ALTER TABLE doc_comments ADD COLUMN IF NOT EXISTS type VARCHAR DEFAULT 'comment';`
+  );
+
   console.log("DuckDB initialized in duckdb.ts");
 
   // Make the connection available in server routes

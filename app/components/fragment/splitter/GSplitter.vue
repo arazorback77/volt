@@ -18,7 +18,10 @@
         >
           <slot name="left" />
         </SplitterPanel>
-        <SplitterResizeHandle class="w-0.5 bg-elevated hover:w-2" />
+        <SplitterResizeHandle class="relative w-[9px] flex items-center justify-center cursor-col-resize group">
+          <div class="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-muted group-hover:bg-primary/40 transition-colors" />
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[7px] h-6 rounded-full border border-muted bg-background group-hover:border-primary/60 transition-colors" />
+        </SplitterResizeHandle>
       </template>
       <SplitterPanel id="lmr-group-main" :default-size="mainSize" class="px-20">
         <UButton
@@ -71,7 +74,10 @@
         <slot name="main" />
       </SplitterPanel>
       <template v-if="$slots.right">
-        <SplitterResizeHandle class="w-0.5 bg-elevated hover:w-2" />
+        <SplitterResizeHandle class="relative w-[9px] flex items-center justify-center cursor-col-resize group">
+          <div class="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-muted group-hover:bg-primary/40 transition-colors" />
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[7px] h-6 rounded-full border border-muted bg-background group-hover:border-primary/60 transition-colors" />
+        </SplitterResizeHandle>
 
         <SplitterPanel
           id="lmr-group-right"

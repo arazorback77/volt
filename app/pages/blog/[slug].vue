@@ -1,28 +1,164 @@
-<script setup>
-definePageMeta({
-  layout: "false",
+<script setup lang="ts">
+import TlTmrb from "~/layouts/section/tl(tmrb).vue";
+
+definePageMeta({ layout: false });
+
+const route = useRoute();
+const slug = route.params.slug as string;
+const toast = useToast();
+
+const { data: navigation } = await useAsyncData("navigation", () =>
+  queryCollectionNavigation("blog")
+);
+const { data: post } = await useAsyncData(`blog-${slug}`, () =>
+  queryCollection("blog").path(`/blog/${slug}`).first()
+);
+const { data: surround } = await useAsyncData(`blog-${slug}-surround`, () =>
+  queryCollectionItemSurroundings("blog", `/blog/${slug}`)
+);
+
+const docPath = `/blog/${slug}`;
+const {
+  contentContainer,
+  myComments,
+  myHighlights,
+  pendingComments,
+  selectedText,
+  selectedColor,
+  showContextMenu,
+  showEditor,
+  menuPosition,
+  handleDocumentMouseUp,
+  openEditor,
+  closeAll,
+  applyHighlights,
+  fetchComments,
+  createHighlight,
+  createComment,
+  updateComment,
+  publishComment,
+  cancelPublish,
+  deleteComment,
+  approveComment,
+  rejectComment,
+} = useDocComment(docPath);
+
+const saving = ref(false);
+const panelTab = ref("my");
+
+function handleOpenEditor() {
+  panelTab.value = "my";
+  openEditor();
+}
+
+async function handleHighlight() {
+  try {
+    await createHighlight();
+    await nextTick();
+    applyHighlights(contentContainer.value);
+    panelTab.value = "highlights";
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "저장 중 오류가 발생했습니다.";
+    toast.add({ title: "하이라이트 실패", description: msg, color: "error" });
+  }
+}
+
+async function handleCreate(body: string) {
+  saving.value = true;
+  try {
+    await createComment(body);
+    await nextTick();
+    applyHighlights(contentContainer.value);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "저장 중 오류가 발생했습니다.";
+    toast.add({ title: "저장 실패", description: msg, color: "error" });
+  } finally {
+    saving.value = false;
+  }
+}
+
+async function handleUpdate(id: string, body: string) {
+  try {
+    await updateComment(id, body);
+  } catch (e: unknown) {
+    console.error("[handleUpdate]", e);
+    const msg = e instanceof Error ? e.message : JSON.stringify(e);
+    toast.add({ title: "수정 실패", description: msg, color: "error" });
+  }
+}
+
+async function handleDelete(id: string) {
+  try {
+    await deleteComment(id);
+    await nextTick();
+    applyHighlights(contentContainer.value);
+  } catch (e: unknown) {
+    console.error("[handleDelete]", e);
+    const msg = e instanceof Error ? e.message : JSON.stringify(e);
+    toast.add({ title: "삭제 실패", description: msg, color: "error" });
+  }
+}
+
+async function handlePublish(id: string) {
+  try {
+    await publishComment(id);
+  } catch (e: unknown) {
+    console.error("[handlePublish]", e);
+    const msg = e instanceof Error ? e.message : JSON.stringify(e);
+    toast.add({ title: "게시 요청 실패", description: msg, color: "error" });
+  }
+}
+
+async function handleCancelPublish(id: string) {
+  try {
+    await cancelPublish(id);
+  } catch (e: unknown) {
+    console.error("[handleCancelPublish]", e);
+    const msg = e instanceof Error ? e.message : JSON.stringify(e);
+    toast.add({ title: "취소 실패", description: msg, color: "error" });
+  }
+}
+
+async function handleReject(id: string) {
+  try {
+    await rejectComment(id);
+    await nextTick();
+    applyHighlights(contentContainer.value);
+  } catch (e: unknown) {
+    console.error("[handleReject]", e);
+    const msg = e instanceof Error ? e.message : JSON.stringify(e);
+    toast.add({ title: "반려 실패", description: msg, color: "error" });
+  }
+}
+
+async function handleApprove(id: string) {
+  try {
+    await approveComment(id);
+    await nextTick();
+    applyHighlights(contentContainer.value);
+    toast.add({ title: "승인 완료", description: "문서에 반영되었습니다.", color: "success" });
+  } catch {
+    toast.add({ title: "승인 실패", color: "error" });
+  }
+}
+
+onMounted(async () => {
+  document.addEventListener("mouseup", handleDocumentMouseUp);
+  await fetchComments();
+  await nextTick();
+  applyHighlights(contentContainer.value);
 });
 
-const slug = useRoute().params.slug;
-console.log(slug);
-
-const { data: navigation } = await useAsyncData("navigation", () => {
-  return queryCollectionNavigation("blog");
-});
-
-const { data: post } = await useAsyncData(`blog-${slug}`, () => {
-  return queryCollection("blog").path(`/blog/${slug}`).first();
-});
-
-const { data: surround } = await useAsyncData(`blog-${slug}-surround`, () => {
-  return queryCollectionItemSurroundings("blog", `/blog/${slug}`);
+onUnmounted(() => {
+  document.removeEventListener("mouseup", handleDocumentMouseUp);
 });
 </script>
 
 <template>
-  <TemplateGof>
+  <TlTmrb>
+    <!-- Left: Navigation -->
     <template #left>
-      <div class="ps-4">
+      <div class="px-4 py-4 overflow-y-auto h-full">
         <UContentNavigation
           :navigation="navigation"
           highlight
@@ -34,37 +170,28 @@ const { data: surround } = await useAsyncData(`blog-${slug}-surround`, () => {
             list: 'mx-0 mt-0',
             item: 'ps-0 ms-0',
             link: 'px-0',
-            itemWithChildren: 'ps-0  ms-0',
+            itemWithChildren: 'ps-0 ms-0',
             listWithChildren: 'ms-4',
           }"
         />
-        <ClientOnly>
-          <LazyUContentSearch
-            v-model:search-term="searchTerm"
-            :files="files"
-            shortcut="meta_k"
-            :navigation="data"
-            :links="links"
-            :fuse="{ resultLimit: 42 }"
-          />
-        </ClientOnly>
       </div>
     </template>
 
+    <!-- TOC -->
+    <template #toc>
+      <div class="px-4 py-4 overflow-y-auto h-full">
+        <UContentToc :links="post?.body?.toc?.links" />
+      </div>
+    </template>
+
+    <!-- Main: Document content -->
     <template #main>
-      <div class="w-full flex flex-col px-8 gap-4">
-        <div class="w-full h-10 bg-accent flex items-center flex-none px-0">
-          <!-- <UBreadcrumb :items="items" /> -->
-          <p>header for breadbrum</p>
-        </div>
-        <div
-          class="w-full h-70 lg:min-h-[calc(100vh-var(--g-totalsum-height)-72px)] min-h-[calc(100vh-var(--g-innersum-height)-72px)] overflow-y-auto pb-16"
-        >
-          <ContentRenderer :value="post" />
-        </div>
-        <div
-          class="w-full h-(--g-inner-height) flex-none justify-center items-center"
-        >
+      <div
+        ref="contentContainer"
+        class="px-8 py-4 overflow-y-auto h-full"
+      >
+        <ContentRenderer :value="post" />
+        <div class="mt-8">
           <UContentSurround
             :surround="surround"
             :ui="{
@@ -77,12 +204,38 @@ const { data: surround } = await useAsyncData(`blog-${slug}-surround`, () => {
           />
         </div>
       </div>
+
+      <CommentContextMenu
+        :show="showContextMenu"
+        :x="menuPosition.x"
+        :y="menuPosition.y"
+        :selected-color="selectedColor"
+        @highlight="handleHighlight"
+        @add-comment="handleOpenEditor"
+        @close="closeAll"
+        @update:selected-color="selectedColor = $event"
+      />
     </template>
 
+    <!-- Right: Comment panel -->
     <template #right>
-      <div class="flex flex-col py-10">
-        <UContentToc :links="post?.body?.toc?.links" />
-      </div>
+      <CommentPanel
+        v-model:tab="panelTab"
+        :my-comments="myComments"
+        :my-highlights="myHighlights"
+        :pending-comments="pendingComments"
+        :selected-text="selectedText"
+        :show-editor="showEditor"
+        :saving="saving"
+        @create="handleCreate"
+        @update="handleUpdate"
+        @publish="handlePublish"
+        @cancel-publish="handleCancelPublish"
+        @delete="handleDelete"
+        @approve="handleApprove"
+        @reject="handleReject"
+        @close-editor="closeAll"
+      />
     </template>
-  </TemplateGof>
+  </TlTmrb>
 </template>
