@@ -6,8 +6,8 @@
     </div>
 
     <!-- Error -->
-    <div v-else-if="error" class="py-3 px-4 text-sm text-red-500">
-      {{ error.statusMessage || error.message }}
+    <div v-else-if="displayError" class="py-3 px-4 text-sm text-red-500">
+      {{ displayError }}
     </div>
 
     <!-- Data -->
@@ -16,7 +16,7 @@
       <div ref="containerEl" class="overflow-x-auto overflow-y-hidden">
         <table
           ref="tableEl"
-          :class="['border-spacing-0 w-full border-separate text-sm', tableFixed && 'table-fixed']"
+          class="border-spacing-0 w-full border-separate text-sm table-fixed"
         >
           <!-- Column widths -->
           <colgroup>
@@ -35,11 +35,9 @@
                     'border-surface-200 dark:border-surface-700',
                     'bg-surface-100 dark:bg-surface-800',
                     'text-surface-700 dark:text-surface-0',
-                    'truncate max-w-0 sticky top-0',
-                    ci < props.headerCols ? 'z-20' : 'z-10',
+                    'truncate max-w-0 sticky top-0 z-10',
                     headerAlignClass(ci),
                   ]"
-                  :style="thStyle(ci)"
                   :title="cell.value ?? ''"
                 >
                   {{ cell.value ?? '' }}
@@ -62,12 +60,8 @@
                   :class="[
                     'py-3 px-4 border-b border-r last:border-r-0 truncate max-w-0',
                     'border-surface-200 dark:border-surface-800',
-                    ci < props.headerCols
-                      ? 'sticky z-10 font-medium bg-surface-50 dark:bg-surface-900 border-r-2 border-r-surface-200 dark:border-r-surface-700'
-                      : '',
                     bodyAlignClass(ci),
                   ]"
-                  :style="ci < props.headerCols ? { left: `${stickyLeft(ci)}px` } : undefined"
                   :title="cell.value ?? ''"
                 >
                   {{ cell.value ?? '' }}
@@ -100,12 +94,6 @@ const props = withDefaults(defineProps<{
    */
   headerRows?: number
   /**
-   * Sticky left column count.
-   * These columns are fixed when scrolling horizontally.
-   * @default 1
-   */
-  headerCols?: number
-  /**
    * Header row cell alignments, comma-separated.
    * Single value applies to all columns. Per-column: "C,C,R,R"
    * Values: L/left | C/center | R/right
@@ -124,7 +112,6 @@ const props = withDefaults(defineProps<{
    * Single value applies to all columns. Per-column: "80,1fr,2fr,120"
    * Values: pixel number | Nfr (weighted flex share) | auto
    * "1fr,2fr,3fr" → 1:2:3 split of remaining space (CSS Grid fr semantics).
-   * Asterisk shorthand also accepted: "*"=1fr, "**"=2fr, "***"=3fr.
    * Uses table-layout:fixed — fr columns share leftover space by weight.
    * @default "1fr"  (all columns equal weight)
    */
@@ -138,7 +125,6 @@ const props = withDefaults(defineProps<{
   autoFit?: boolean
 }>(), {
   headerRows:  1,
-  headerCols:  1,
   headerAlign: 'C',
   bodyAlign:   'L',
   colSize:     '1fr',
@@ -175,10 +161,22 @@ const { data: xlsxData, pending, error } = await useFetch<{
   data: Record<string, { rows: CellData[][] }>
 }>('/api/xlsx', { query: { file: fileName } })
 
+const tabError = computed<string | null>(() => {
+  if (!props.tab) return null
+  const sheets = xlsxData.value?.sheets ?? []
+  if (sheets.length > 0 && !sheets.includes(props.tab))
+    return `Sheet "${props.tab}" not found in ${props.file}. Available: ${sheets.join(', ')}`
+  return null
+})
+
+const displayError = computed<string | null>(() => {
+  if (error.value) return error.value.statusMessage || error.value.message || null
+  return tabError.value
+})
+
 const activeTab = computed(() => {
   const sheets = xlsxData.value?.sheets ?? []
-  if (props.tab && sheets.includes(props.tab)) return props.tab
-  return sheets[0] ?? ''
+  return props.tab ?? sheets[0] ?? ''
 })
 
 const currentRows    = computed(() => xlsxData.value?.data[activeTab.value]?.rows ?? [])
@@ -193,18 +191,15 @@ const numCols        = computed(() => currentRows.value[0]?.length ?? 0)
  *
  * Supported notations (both produce the same result):
  *   "1fr" / "2fr" / "3fr"  — CSS Grid–style fraction (recommended in MDC)
- *   "*" / "**" / "***"     — asterisk shorthand (weight = asterisk count)
- *   "120"                  — fixed px
+ *    "120"                  — fixed px
  *   "auto"                 — browser auto width
  */
 function parseColToken(raw: string): { isPx: boolean; px: number | null; weight: number | null } {
   const v = raw.trim()
   // fr notation: "1fr", "2fr", "0.5fr", etc.
   const frMatch = v.match(/^(\d+(?:\.\d+)?)fr$/i)
-  if (frMatch) return { isPx: false, px: null, weight: parseFloat(frMatch[1]) }
-  // asterisk notation: "*", "**", "***"
-  if (/^\*+$/.test(v)) return { isPx: false, px: null, weight: v.length }
-  // auto / empty
+  if (frMatch) return { isPx: false, px: null, weight: parseFloat(frMatch[1]!) }
+    // auto / empty
   if (v === 'auto' || v === '') return { isPx: false, px: null, weight: null }
   // fixed px
   const n = parseInt(v)
@@ -212,29 +207,20 @@ function parseColToken(raw: string): { isPx: boolean; px: number | null; weight:
   return { isPx: false, px: null, weight: null }
 }
 
-/** Parse `colSize` prop → array of pixel widths (null = flexible/star/auto) */
-const initialColWidths = computed((): (number | null)[] => {
-  if (!props.colSize) return []
-  return props.colSize.split(',').map(s => parseColToken(s).px)
-})
-
-/**
- * Parse `colSize` prop → star/fr weights for flexible columns.
- * "1fr" → 1, "2fr" → 2, "*" → 1, "**" → 2  Px values and "auto" → null.
- */
-const initialColStarWeights = computed((): (number | null)[] => {
-  if (!props.colSize) return []
-  return props.colSize.split(',').map(s => parseColToken(s).weight)
-})
+/** Parse `colSize` prop once → array of { isPx, px, weight } tokens */
+const parsedCols = computed(() =>
+  (props.colSize ?? '').split(',').map(s => parseColToken(s))
+)
 
 /**
  * Effective px width for column ci.
  * Single-value colSize fans out as default for all columns.
  */
 function effectiveInitialWidth(ci: number): number | null {
-  const arr = initialColWidths.value
+  const arr = parsedCols.value
   if (arr.length === 0) return null
-  return arr[ci] !== undefined ? arr[ci] : (arr[arr.length - 1] ?? null)
+  const token = arr[ci] ?? arr[arr.length - 1]
+  return token?.px ?? null
 }
 
 /**
@@ -245,10 +231,10 @@ function effectiveInitialWidth(ci: number): number | null {
 function effectiveInitialWeight(ci: number): number | null {
   // If the column has an explicit px width, it's not a star column
   if (effectiveInitialWidth(ci) !== null) return null
-  const arr = initialColStarWeights.value
+  const arr = parsedCols.value
   if (arr.length === 0) return 1   // no colSize → all columns default to weight 1
-  const w = arr[ci] !== undefined ? arr[ci] : (arr[arr.length - 1] ?? null)
-  return w   // null means px/auto column (already checked above, so this covers 'auto')
+  const token = arr[ci] ?? arr[arr.length - 1]
+  return token?.weight ?? null
 }
 
 /**
@@ -263,15 +249,6 @@ const autoFitPcts = ref<(number | null)[]>([])
  *  Used to convert % column widths → px for sticky `left` offsets. */
 const containerEl = ref<HTMLElement>()
 const tableContainerWidth = ref(0)
-
-/**
- * table-layout:fixed when colSize is set or auto-fit percentages are active.
- * With table-fixed + w-full, columns share available space proportionally.
- */
-const tableFixed = computed(() =>
-  !!props.colSize ||
-  autoFitPcts.value.some(p => p != null),
-)
 
 /**
  * Aggregates column width info across two tiers:
@@ -334,42 +311,6 @@ function getColStyle(ci: number): string | undefined {
   return `width: calc((100% - ${totalFixed}px) * ${weight} / ${totalStarWeight})`
 }
 
-// ── sticky col offsets ────────────────────────────────────────────────────────
-
-/**
- * Calculates `left` px for sticky column `ci`.
- * Handles two column tiers: px-fixed → auto-fit % → fr star.
- */
-function stickyLeft(ci: number): number {
-  let left = 0
-  for (let i = 0; i < ci; i++) {
-    // Tier 1: explicit col-size px
-    const px = effectiveInitialWidth(i)
-    if (px != null) { left += px; continue }
-
-    // Tier 2: auto-fit % — convert to px using container width
-    const pct = autoFitPcts.value[i]
-    if (pct != null) {
-      const { totalFixed, pctSum } = starColInfo.value
-      const share = pctSum > 0 ? pct / pctSum : 0
-      left += share * Math.max(0, tableContainerWidth.value - totalFixed)
-      continue
-    }
-
-    // Tier 3: fr/star weighted fallback
-    const { totalFixed, totalStarWeight } = starColInfo.value
-    const weight = effectiveInitialWeight(i) ?? 1
-    if (totalStarWeight > 0)
-      left += Math.max(0, tableContainerWidth.value - totalFixed) * weight / totalStarWeight
-    else left += 100
-  }
-  return left
-}
-
-function thStyle(ci: number): Record<string, string> | undefined {
-  return ci < props.headerCols ? { left: `${stickyLeft(ci)}px` } : undefined
-}
-
 // ── auto-fit ──────────────────────────────────────────────────────────────────
 
 const tableEl = ref<HTMLTableElement>()
@@ -404,7 +345,7 @@ function autoFitCols() {
   const MAX = 360
 
   const numHeader = headerRowsData.value.length
-  const allRows   = [...headerRowsData.value, ...bodyRowsData.value]
+  const allRows   = currentRows.value
 
   // Step 1: measure ideal px width for each * column
   const pxWidths: (number | null)[] = []
