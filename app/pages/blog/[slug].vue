@@ -186,11 +186,10 @@ onUnmounted(() => {
 
     <!-- Main: Document content -->
     <template #main>
-      <div
-        ref="contentContainer"
-        class="px-8 py-4 overflow-y-auto h-full"
-      >
-        <ContentRenderer :value="post" />
+      <div class="px-8 py-4 overflow-y-auto h-full">
+        <div ref="contentContainer">
+          <ContentRenderer :value="post" />
+        </div>
         <div class="mt-8">
           <UContentSurround
             :surround="surround"
@@ -203,6 +202,7 @@ onUnmounted(() => {
             }"
           />
         </div>
+        <BoardThread :page-path="docPath" />
       </div>
 
       <CommentContextMenu

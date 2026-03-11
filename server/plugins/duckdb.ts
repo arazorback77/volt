@@ -46,6 +46,35 @@ export default defineNitroPlugin(async (nitroApp) => {
     `ALTER TABLE doc_comments ADD COLUMN IF NOT EXISTS type VARCHAR DEFAULT 'comment';`
   );
 
+  // users 테이블 — provider-agnostic 유저 모델
+  await connection.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id           VARCHAR PRIMARY KEY,
+      provider     VARCHAR NOT NULL,
+      external_id  VARCHAR NOT NULL,
+      email        VARCHAR,
+      display_name VARCHAR,
+      avatar_url   VARCHAR,
+      role         VARCHAR DEFAULT 'user',
+      created_at   TIMESTAMP DEFAULT now(),
+      updated_at   TIMESTAMP DEFAULT now(),
+      UNIQUE (provider, external_id)
+    );
+  `);
+
+  // board_comments 테이블 — Utterances 스타일 게시판 댓글
+  await connection.run(`
+    CREATE TABLE IF NOT EXISTS board_comments (
+      id          VARCHAR PRIMARY KEY,
+      page_path   VARCHAR NOT NULL,
+      author_id   VARCHAR NOT NULL,
+      body        VARCHAR NOT NULL,
+      parent_id   VARCHAR,
+      created_at  TIMESTAMP DEFAULT now(),
+      updated_at  TIMESTAMP DEFAULT now()
+    );
+  `);
+
   console.log("DuckDB initialized in duckdb.ts");
 
   // Make the connection available in server routes
