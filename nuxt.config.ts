@@ -5,13 +5,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   srcDir: "app/",
   css: ["~/assets/css/main.css"],
-  modules: [
-    "@nuxt/content",
-    "@nuxt/eslint",
-    "@nuxt/image",
-    "@clerk/nuxt",
-    "@nuxt/ui",
-  ],
+  modules: ["@nuxt/content", "@nuxt/eslint", "@nuxt/image", "@clerk/nuxt", "@nuxt/ui", "nuxt-studio"],
   runtimeConfig: {
     apiSecret: "", // can be overridden by NUXT_API_SECRET environment variable
     motherduckToken: "", // can be overridden by NUXT_MOTHERDUCK_TOKEN environment variable
