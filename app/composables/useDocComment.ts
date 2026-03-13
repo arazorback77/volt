@@ -1,5 +1,5 @@
 export type CommentStatus = "draft" | "pending" | "approved" | "rejected";
-export type CommentType = "comment" | "highlight";
+export type CommentType = "comment" | "highlight" | "supplement";
 export type HighlightColor = "yellow" | "green" | "blue" | "red" | "purple";
 
 export const HIGHLIGHT_COLORS: Record<HighlightColor, { bg: string; label: string }> = {
@@ -191,44 +191,60 @@ export function useDocComment(docPath: string) {
     }
   }
 
+  // ── Internal helpers ─────────────────────────────────────────────
+
+  /** Replace a comment in the local list by id (splice for Vue reactivity). */
+  function replaceComment(id: string, updated: DocComment) {
+    const idx = comments.value.findIndex((c) => c.id === id);
+    if (idx !== -1) comments.value.splice(idx, 1, updated);
+  }
+
+  /** Common POST body fields for createHighlight / createComment. */
+  function selectionPayload() {
+    return {
+      doc_path: docPath,
+      selected_text: selectedText.value,
+      anchor_context: anchorContext.value || null,
+      anchor_offset: anchorOffset.value,
+      author_id: authorId.value,
+      highlight_color: selectedColor.value,
+    };
+  }
+
   async function createHighlight() {
-    if (!selectedText.value) {
-      throw new Error("선택된 텍스트가 없습니다.");
-    }
+    if (!selectedText.value) throw new Error("선택된 텍스트가 없습니다.");
     const item = await $fetch<DocComment>("/api/comments", {
       method: "POST",
-      body: {
-        doc_path: docPath,
-        selected_text: selectedText.value,
-        anchor_context: anchorContext.value || null,
-        anchor_offset: anchorOffset.value,
-        author_id: authorId.value,
-        highlight_color: selectedColor.value,
-        type: "highlight",
-      },
+      body: { ...selectionPayload(), type: "highlight" },
     });
     comments.value.push(item);
     closeAll();
     return item;
   }
 
-  async function createComment(commentBody: string) {
-    if (!selectedText.value) {
-      throw new Error("선택된 텍스트가 없습니다. 텍스트를 먼저 선택해주세요.");
-    }
-
-    const comment = await $fetch<DocComment>("/api/comments", {
+  async function createSupplement(headingId: string, headingLabel: string, body: string) {
+    const item = await $fetch<DocComment>("/api/comments", {
       method: "POST",
       body: {
         doc_path: docPath,
-        selected_text: selectedText.value,
-        anchor_context: anchorContext.value || null,
-        anchor_offset: anchorOffset.value,
-        body: commentBody,
+        selected_text: headingLabel || headingId,
+        anchor_context: headingId || null,
+        anchor_offset: 0,
+        body,
+        type: "supplement",
+        status: "pending",
         author_id: authorId.value,
-        highlight_color: selectedColor.value,
-        type: "comment",
       },
+    });
+    comments.value.push(item);
+    return item;
+  }
+
+  async function createComment(commentBody: string) {
+    if (!selectedText.value) throw new Error("선택된 텍스트가 없습니다.");
+    const comment = await $fetch<DocComment>("/api/comments", {
+      method: "POST",
+      body: { ...selectionPayload(), body: commentBody, type: "comment" },
     });
     comments.value.push(comment);
     closeAll();
@@ -240,8 +256,7 @@ export function useDocComment(docPath: string) {
       method: "PATCH",
       body: { body },
     });
-    const idx = comments.value.findIndex((c) => c.id === id);
-    if (idx !== -1) comments.value.splice(idx, 1, updated);
+    replaceComment(id, updated);
     return updated;
   }
 
@@ -250,8 +265,7 @@ export function useDocComment(docPath: string) {
       method: "PATCH",
       body: { status: "pending" },
     });
-    const idx = comments.value.findIndex((c) => c.id === id);
-    if (idx !== -1) comments.value.splice(idx, 1, updated);
+    replaceComment(id, updated);
     return updated;
   }
 
@@ -260,8 +274,7 @@ export function useDocComment(docPath: string) {
       method: "PATCH",
       body: { status: "draft" },
     });
-    const idx = comments.value.findIndex((c) => c.id === id);
-    if (idx !== -1) comments.value.splice(idx, 1, updated);
+    replaceComment(id, updated);
     return updated;
   }
 
@@ -273,7 +286,7 @@ export function useDocComment(docPath: string) {
   async function approveComment(id: string) {
     await $fetch(`/api/comments/${id}/approve`, { method: "POST" });
     const idx = comments.value.findIndex((c) => c.id === id);
-    if (idx !== -1) comments.value[idx].status = "approved";
+    if (idx !== -1) comments.value.splice(idx, 1, { ...comments.value[idx], status: "approved" });
   }
 
   async function rejectComment(id: string) {
@@ -281,18 +294,20 @@ export function useDocComment(docPath: string) {
       method: "PATCH",
       body: { status: "rejected" },
     });
-    const idx = comments.value.findIndex((c) => c.id === id);
-    if (idx !== -1) comments.value.splice(idx, 1, updated);
+    replaceComment(id, updated);
   }
 
   const myComments = computed(() =>
-    comments.value.filter((c) => c.type !== "highlight" && c.status !== "approved")
+    comments.value.filter((c) => c.type === "comment" && c.status !== "approved")
   );
   const myHighlights = computed(() =>
     comments.value.filter((c) => c.type === "highlight")
   );
   const pendingComments = computed(() =>
     comments.value.filter((c) => c.type !== "highlight" && c.status === "pending")
+  );
+  const approvedSupplements = computed(() =>
+    comments.value.filter((c) => c.type === "supplement" && c.status === "approved")
   );
 
   return {
@@ -302,6 +317,7 @@ export function useDocComment(docPath: string) {
     myComments,
     myHighlights,
     pendingComments,
+    approvedSupplements,
     loading,
     selectedText,
     anchorContext,
@@ -316,6 +332,7 @@ export function useDocComment(docPath: string) {
     fetchComments,
     createHighlight,
     createComment,
+    createSupplement,
     updateComment,
     publishComment,
     cancelPublish,

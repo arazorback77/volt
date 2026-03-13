@@ -7,17 +7,18 @@ export default defineEventHandler(async (event) => {
 
   const { duckdb } = useNitroApp();
 
-  // highlight는 항상 작성자만, comment는 draft만 작성자 제한
+  // highlight는 항상 작성자만, comment/supplement는 draft만 작성자 제한
   const result = await duckdb.runAndReadAll(
     `SELECT * FROM doc_comments
      WHERE doc_path = ?
        AND (
          (type = 'highlight' AND author_id = ?)
          OR (type = 'comment' AND (status != 'draft' OR author_id = ?))
+         OR (type = 'supplement' AND (status != 'draft' OR author_id = ?))
          OR (type IS NULL AND (status != 'draft' OR author_id = ?))
        )
      ORDER BY created_at ASC`,
-    [path, author_id ?? "", author_id ?? "", author_id ?? ""]
+    [path, author_id ?? "", author_id ?? "", author_id ?? "", author_id ?? ""]
   );
   return result.getRowObjectsJson();
 });

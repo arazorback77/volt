@@ -7,7 +7,7 @@
       v-model="body"
       :rows="3"
       autofocus
-      placeholder="코멘트를 입력하세요..."
+      placeholder="MDC 문법으로 작성하세요. (예: **굵게**, `코드`, ::XlsxTable 컴포넌트 사용 가능)"
       class="text-sm"
     />
     <div class="flex justify-end gap-2">

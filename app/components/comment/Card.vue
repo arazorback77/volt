@@ -36,7 +36,7 @@
 
       <!-- View mode -->
       <template v-else>
-        <p class="text-sm whitespace-pre-wrap">{{ comment.body }}</p>
+        <MDC :value="comment.body ?? ''" tag="div" class="prose prose-sm max-w-none" />
 
         <!-- Status badge -->
         <div class="flex items-center justify-between">

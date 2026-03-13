@@ -79,8 +79,8 @@
 // Prevent auto-fallthrough so we can manually control where $attrs.class is applied
 defineOptions({ inheritAttrs: false })
 
-type CellData = { value: string | null; rowspan: number; colspan: number; skip: boolean }
-type Align = 'left' | 'center' | 'right'
+import { useXlsxData, parseAlignProp, effectiveAlign } from '~/composables/useXlsxData'
+import type { CellData, Align } from '~/composables/useXlsxData'
 
 const props = withDefaults(defineProps<{
   /** XLSX/CSV filename in /public/xlsx/ */
@@ -130,54 +130,11 @@ const props = withDefaults(defineProps<{
   colSize:     '1fr',
 })
 
-// ── wrapper class ─────────────────────────────────────────────────────────────
+// ── fetch + wrapper ────────────────────────────────────────────────────────────
 
 const attrs = useAttrs()
-
-/**
- * Merge base class with $attrs.class from MDC.
- * YAML may produce comma-separated values (e.g. "max-w-2xl, p-10");
- * commas are stripped so all tokens are treated as space-separated class names.
- */
-const wrapperClass = computed(() => {
-  const base = 'my-4'
-  const extra = attrs.class
-  if (!extra) return base
-  // Normalise: join arrays, strip commas, collapse whitespace
-  const raw = Array.isArray(extra) ? extra.join(' ') : String(extra)
-  const cleaned = raw.replace(/,/g, ' ').replace(/\s+/g, ' ').trim()
-  return cleaned ? `${base} ${cleaned}` : base
-})
-
-// ── fetch ─────────────────────────────────────────────────────────────────────
-
-const fileName = computed(() => {
-  const f = props.file.trim()
-  return /\.(xlsx|xls|csv)$/i.test(f) ? f : `${f}.xlsx`
-})
-
-const { data: xlsxData, pending, error } = await useFetch<{
-  sheets: string[]
-  data: Record<string, { rows: CellData[][] }>
-}>('/api/xlsx', { query: { file: fileName } })
-
-const tabError = computed<string | null>(() => {
-  if (!props.tab) return null
-  const sheets = xlsxData.value?.sheets ?? []
-  if (sheets.length > 0 && !sheets.includes(props.tab))
-    return `Sheet "${props.tab}" not found in ${props.file}. Available: ${sheets.join(', ')}`
-  return null
-})
-
-const displayError = computed<string | null>(() => {
-  if (error.value) return error.value.statusMessage || error.value.message || null
-  return tabError.value
-})
-
-const activeTab = computed(() => {
-  const sheets = xlsxData.value?.sheets ?? []
-  return props.tab ?? sheets[0] ?? ''
-})
+const { wrapperClass, xlsxData, pending, displayError, activeTab } =
+  await useXlsxData(props, attrs)
 
 const currentRows    = computed(() => xlsxData.value?.data[activeTab.value]?.rows ?? [])
 const headerRowsData = computed(() => currentRows.value.slice(0, props.headerRows))
@@ -384,27 +341,8 @@ function autoFitCols() {
 
 // ── alignment ─────────────────────────────────────────────────────────────────
 
-function parseAlignProp(val?: string): Align[] {
-  if (!val) return []
-  return val.split(',').map(a => {
-    const v = a.trim().toLowerCase()
-    if (v === 'c' || v === 'center') return 'center'
-    if (v === 'r' || v === 'right')  return 'right'
-    return 'left'
-  })
-}
-
 function toClass(a: Align): string {
   return a === 'center' ? 'text-center' : a === 'right' ? 'text-right' : 'text-left'
-}
-
-/**
- * Effective align for column ci.
- * Single-value array fans out as default for all columns.
- */
-function effectiveAlign(arr: Align[], ci: number): Align {
-  if (arr.length === 0) return 'left'
-  return arr[ci] ?? arr[arr.length - 1] ?? 'left'
 }
 
 const colAligns    = computed(() => parseAlignProp(props.bodyAlign))

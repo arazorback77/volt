@@ -20,20 +20,16 @@ export interface BoardCommentNode extends BoardComment {
   children: BoardCommentNode[];
 }
 
-function buildTree(
-  comments: BoardComment[],
-  parentId: string | null = null
-): BoardCommentNode[] {
-  return comments
-    .filter((c) =>
-      parentId === null
-        ? !c.parent_id
-        : c.parent_id === parentId
-    )
-    .map((c) => ({
-      ...c,
-      children: buildTree(comments, c.id),
-    }));
+function buildTree(comments: BoardComment[]): BoardCommentNode[] {
+  const map = new Map<string, BoardCommentNode>(
+    comments.map(c => [c.id, { ...c, children: [] }])
+  )
+  const roots: BoardCommentNode[] = []
+  for (const node of map.values()) {
+    if (node.parent_id === null) roots.push(node)
+    else map.get(node.parent_id)?.children.push(node)
+  }
+  return roots
 }
 
 export function useBoardComment(pagePath: string) {

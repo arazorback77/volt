@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
     author_id?: string;
     highlight_color?: string;
     type?: string;
+    status?: string;
   };
 
   const type = body.type ?? "comment";
@@ -24,9 +25,11 @@ export default defineEventHandler(async (event) => {
   const id = randomUUID();
   const { duckdb } = useNitroApp();
 
+  const status = body.status ?? "draft";
+
   await duckdb.run(
-    `INSERT INTO doc_comments (id, doc_path, selected_text, anchor_context, anchor_offset, body, author_id, highlight_color, type)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO doc_comments (id, doc_path, selected_text, anchor_context, anchor_offset, body, author_id, highlight_color, type, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       body.doc_path,
@@ -37,6 +40,7 @@ export default defineEventHandler(async (event) => {
       body.author_id ?? "anonymous",
       body.highlight_color ?? "yellow",
       type,
+      status,
     ]
   );
 
